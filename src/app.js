@@ -7,6 +7,7 @@ const request = require("request");
 const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
 const { NODE_ENV } = require("./config");
+const SpotifyRouter = require("./spotify/spotify-router");
 
 const BASE_URL = "http://localhost:3000/";
 
@@ -14,11 +15,13 @@ const app = express();
 
 //const morganOption = (process.env.NODE_ENV === 'production')
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
-
+app.use(express.json()); // for parsing application/json
+app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 app.use(cookieParser());
+app.use("/api", SpotifyRouter);
 
 const client_id = process.env.SPOTIFY_CLIENT_ID; // Your client id
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET; // Your secret
@@ -151,6 +154,7 @@ app.get("/refresh_token", function (req, res) {
 
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
+      console.log("refreshed!", body);
       var access_token = body.access_token;
       res.send({
         access_token: access_token,
