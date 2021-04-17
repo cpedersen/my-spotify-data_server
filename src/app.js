@@ -8,7 +8,7 @@ const querystring = require("querystring");
 const cookieParser = require("cookie-parser");
 const { NODE_ENV } = require("./config");
 const SpotifyRouter = require("./spotify/spotify-router");
-
+const { extractAccessToken } = require("./middlewares/extractAccessToken");
 const BASE_URL = "http://localhost:3000/";
 
 const app = express();
@@ -21,6 +21,7 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 app.use(cookieParser());
+app.use(extractAccessToken);
 app.use("/api", SpotifyRouter);
 
 const client_id = process.env.SPOTIFY_CLIENT_ID; // Your client id
@@ -51,7 +52,7 @@ app.get("/login", function (req, res) {
 
   // your application requests authorization
   var scope =
-    "user-read-private user-read-email playlist-read-private playlist-read-collaborative";
+    "user-read-private user-read-recently-played user-read-email playlist-read-private playlist-read-collaborative";
   res.redirect(
     "https://accounts.spotify.com/authorize?" +
       querystring.stringify({

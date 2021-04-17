@@ -1,8 +1,17 @@
+const { default: knex } = require("knex");
 const db = require("../services/knex");
 
 const SpotifyService = {
   getAllUsers() {
     return db.select("*").from("spotify_users");
+  },
+  getUser(id) {
+    return db.select("*").from("spotify_users").where("spotify_user", id);
+  },
+  createUser(spotify_user) {
+    return db("spotify_users").insert({
+      spotify_user,
+    });
   },
   getAllPlaylists() {
     return db.select("*").from("playlists");
@@ -25,9 +34,33 @@ const SpotifyService = {
   insertPlaylists(data) {
     return db("playlists").insert(data);
   },
-
   insertPlaylistTracks(data) {
     return db("playlist_tracks").insert(data);
+  },
+  getExportData(userId) {
+    /*return db
+      .select("track_name, playlist_name")
+      .from("playlist_tracks")
+      .join("tracks", "playlist_tracks.track_id", "=", "tracks.track_id")
+      .join(
+        "playlists",
+        "playlist_tracks.playlist_id",
+        "=",
+        "playlists.playlist_id"
+      );*/
+
+    return db.raw(
+      `select track_name, playlist_name
+    from playlist_tracks 
+    inner join tracks
+    on playlist_tracks.track_id = tracks.track_id
+    inner join playlists
+    on playlist_tracks.playlist_id = playlists.playlist_id
+    where playlist_tracks.spotify_user = ?;`,
+      [userId]
+    );
+
+    // .where("playlist_tracks.spotify_user", userId);
   },
   getTracks({ field, query }) {
     console.log("getting tracks", field, query);

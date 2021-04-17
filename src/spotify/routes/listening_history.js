@@ -1,5 +1,7 @@
 const listeningHistoryRouter = require("express").Router();
-
+const {
+  getListeningHistory,
+} = require("../controllers/listening_history_controller");
 const serializeListeningHistory = (user) => ({
   id: user.id,
   spotify_user: xss(user.spotify_user),
@@ -19,8 +21,6 @@ listeningHistoryRouter.get("/all", (req, res) => {
 });
 
 // /api/history/52341
-listeningHistoryRouter.get("/:user_id", (req, res) => {
-  res.send("ok");
-});
+listeningHistoryRouter.get("/:user_id", getListeningHistory);
 
 module.exports = listeningHistoryRouter;

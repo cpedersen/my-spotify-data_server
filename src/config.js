@@ -18,4 +18,7 @@ module.exports = {
   NODE_ENV: process.env.NODE_ENV || "development",
   CLIENT_ORIGIN: CLIENT_ORIGIN,
   DATABASE_URL,
+  TEST_DATABASE_URL:
+    process.env.TEST_DATABASE_URL ||
+    "postgresql://dunder_mifflin@localhost/spotify_test",
 };

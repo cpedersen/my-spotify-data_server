@@ -1,8 +1,8 @@
 const spotifyModel = require("../spotify-model");
-const { spotify } = require("../spotify-service");
+const { createSpotifyInstance } = require("../spotify-service");
 const withAsync = require("../../helpers/withAsync");
 
-const fetchTracksForPlaylists = async (playlists) => {
+const fetchTracksForPlaylists = async (spotify, playlists) => {
   const { response, error } = await withAsync(() =>
     Promise.all(
       playlists.map((playlist) =>
@@ -31,14 +31,15 @@ const fetchTracksForPlaylists = async (playlists) => {
   };
 };
 
-const fetchUserPlaylists = async (userId) => {
+const fetchUserPlaylists = async (spotify, userId) => {
   const { response, error } = await withAsync(() =>
-    spotify.getUserPlaylists(userId)
+    spotify.getUserPlaylists(userId, {
+      limit: 50,
+    })
   );
-
   console.log({ response, error });
   const { items } = response.body;
-  const data = await fetchTracksForPlaylists(items);
+  const data = await fetchTracksForPlaylists(spotify, items);
   return data;
 };
 
@@ -120,17 +121,30 @@ const insertSyncData = async (data) => {
   ]);
 };
 
+const handleTracksSync = async (spotify, access_token, userId) => {
+  spotify.setAccessToken(access_token);
+  const data = await fetchUserPlaylists(spotify, userId);
+  const preparedData = prepareSyncData(data, userId);
+  await spotifyModel.deleteUserSyncData(userId);
+  const result = await insertSyncData(preparedData);
+  return {
+    preparedData,
+    result,
+  };
+};
+
 const syncTracks = async (req, res) => {
   try {
     console.log(req.headers);
+    const spotify = createSpotifyInstance();
     const access_token = req.headers.authorization.slice(7);
     const { userId } = req.body;
     console.log({ access_token });
-    spotify.setAccessToken(access_token);
-    const data = await fetchUserPlaylists(userId);
-    const preparedData = prepareSyncData(data, userId);
-    await spotifyModel.deleteUserSyncData(userId);
-    const result = await insertSyncData(preparedData);
+    const { result, preparedData } = await handleTracksSync(
+      spotify,
+      access_token,
+      userId
+    );
     console.log(result);
     /*
       Prepare tracks
@@ -180,4 +194,5 @@ const getTracks = async (req, res) => {
 module.exports = {
   syncTracks,
   getTracks,
+  handleTracksSync,
 };
