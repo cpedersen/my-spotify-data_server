@@ -162,7 +162,7 @@ describe("Spotify Database", function () {
         });
     });
 
-    it("GET /api/playlists responds with 200 for tracks data", () => {
+    it("GET /api/playlists responds with 200 for playlists data", () => {
       return supertest(app)
         .get("/api/playlists")
         .expect(200)
@@ -183,7 +183,7 @@ describe("Spotify Database", function () {
         });
     });
 
-    it("GET /api/playlist_tracks responds with 200 for tracks data", () => {
+    it("GET /api/playlist_tracks responds with 200 for playlist_tracks data", () => {
       return supertest(app)
         .get("/api/playlist_tracks")
         .expect(200)
