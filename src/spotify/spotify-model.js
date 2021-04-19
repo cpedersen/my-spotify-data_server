@@ -33,6 +33,9 @@ const SpotifyService = {
     return db("tracks").insert(data);
   },
   insertPlaylists(data) {
+    console.log("************************");
+    console.log({ data });
+    console.log("************************");
     return db("playlists").insert(data);
   },
   insertPlaylistTracks(data) {
