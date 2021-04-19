@@ -57,6 +57,7 @@ CREATE TABLE playlists (
     total_tracks INTEGER NOT NULL
 );
 */
+
 function makeSpotifyArray_playlists() {
   return [
     {
