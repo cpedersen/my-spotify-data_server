@@ -1,6 +1,7 @@
 const { default: knex } = require("knex");
 const db = require("../services/knex");
 
+// TODO - change to SpotifyModel
 const SpotifyService = {
   getAllUsers() {
     return db.select("*").from("spotify_users");
@@ -36,6 +37,12 @@ const SpotifyService = {
   },
   insertPlaylistTracks(data) {
     return db("playlist_tracks").insert(data);
+  },
+  insertListeningHistory(data) {
+    return db("listening_history").insert(data);
+  },
+  insertAudioAnalysis(data) {
+    return db("audio_analysis").insert(data);
   },
   getExportData(userId) {
     /*return db

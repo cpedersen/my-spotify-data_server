@@ -1,6 +1,7 @@
 const spotifyModel = require("../spotify-model");
 const { handleTracksSync } = require("./tracks_controller");
 const { createSpotifyInstance } = require("../spotify-service");
+
 const createSyncUser = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -43,7 +44,7 @@ const exportData = async (req, res) => {
     const { user_id } = req.params;
     console.log("export", req.params);
     const data = await spotifyModel.getExportData(user_id);
-
+    // TODO - is this sending what is needed for export?
     res.send({
       rows: data.rows,
     });

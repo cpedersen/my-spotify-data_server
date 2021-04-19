@@ -1,3 +1,5 @@
+// TODO: Remove this file and use only server.js, which is required for Heroku
+
 const knex = require("knex");
 const { DATABASE_URL } = require("../config");
 

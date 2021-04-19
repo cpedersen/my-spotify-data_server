@@ -1,7 +1,7 @@
 const knex = require("knex");
 const app = require("./app");
-//const { PORT, DATABASE_URL, TEST_DATABASE_URL } = require("./config");
-const { PORT, DATABASE_URL } = require("./config");
+// TODO - test removal of TEST_DATABSE_URL
+const { PORT, DATABASE_URL, TEST_DATABASE_URL } = require("./config");
 
 const db = knex({
   client: "pg",
