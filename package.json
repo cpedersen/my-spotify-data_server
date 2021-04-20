@@ -7,21 +7,38 @@
     "test": "mocha --require test/setup.js",
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "predeploy": "npm audit",
-    "deploy": "git push heroku master"
+    "predeploy": "npm audit && npm run migrate:production",
+    "deploy": "git push heroku main",
+    "migrate": "postgrator --config postgrator-config.js",
+    "migrate:test": "env NODE_ENV=test npm run migrate",
+    "migrate:production": "env ssl=true DATABASE_URL=$(heroku config:get DATABASE_URL -a quiet-gorge-71347) npm run migrate",
+    "postdeploy": "npm run migrate:production"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "helmet": "^4.0.0",
-    "morgan": "^1.10.0"
+    "knex": "^0.95.4",
+    "logger": "0.0.1",
+    "migrate": "^1.7.0",
+    "morgan": "^1.10.0",
+    "path": "^0.12.7",
+    "pg": "^8.5.1",
+    "postgrator": "^4.1.1",
+    "postgrator-cli": "^4.0.0",
+    "querystring": "^0.2.1",
+    "request": "^2.88.2",
+    "spotify-web-api-node": "^5.0.2",
+    "winston": "^3.3.3",
+    "xss": "^1.0.8"
   },
   "devDependencies": {
-    "chai": "^4.2.0",
+    "chai": "^4.3.4",
     "mocha": "^8.1.1",
     "nodemon": "^2.0.4",
     "supertest": "^4.0.2"
@@ -29,5 +46,8 @@
   "globals": {
     "supertest": true,
     "expect": true
+  },
+  "directories": {
+    "test": "test"
   }
 }
