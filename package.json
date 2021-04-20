@@ -14,6 +14,9 @@
     "migrate:production": "env ssl=true DATABASE_URL=$(heroku config:get DATABASE_URL -a quiet-gorge-71347) npm run migrate",
     "postdeploy": "npm run migrate:production"
   },
+  "engines": {
+    "node": "14.15.5"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
