@@ -1,23 +1,90 @@
 const spotifyModel = require("../spotify-model");
 const { createSpotifyInstance } = require("../spotify-service");
 const withAsync = require("../../helpers/withAsync");
+const fetch = require("node-fetch");
+
+const fetchPlaylistItems = async ({
+  playlistId,
+  data,
+  access_token,
+  config = {
+    limit: 100,
+    offset: 0,
+  },
+}) => {
+  const { limit, offset } = config;
+  // Make a request to fetch playlist items
+  const response = await fetch(
+    `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=US&limit=${limit}&offset=${offset}`,
+    {
+      method: "get",
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const responseBody = await response.json();
+  const { items, next } = responseBody;
+  // On the first call, there is no data, so set it up
+  if (!data) {
+    data = {
+      id: playlistId,
+      tracks: items,
+    };
+  } else {
+    // On further calls, we already have data, so we need to
+    // concatenate previously fetched tracks with new ones
+    data.tracks = [...data.tracks, ...items];
+  }
+  // If there is more data to fetch, then call fetchPlaylist recursively
+  if (next) {
+    return fetchPlaylistItems({
+      playlistId,
+      data,
+      access_token,
+      config: {
+        limit,
+        offset: limit + offset,
+      },
+    });
+  } else {
+    // There is no more data to fetch, so return what we gathered
+    return data;
+  }
+};
 
 const fetchTracksForPlaylists = async (spotify, playlists) => {
   const { response, error } = await withAsync(() =>
     Promise.all(
       playlists.map((playlist) =>
-        spotify.getPlaylist(playlist.id, {
-          limit: 500,
+        fetchPlaylistItems({
+          playlistId: playlist.id,
+          playlistName: playlist.name,
+          access_token: spotify.getAccessToken(),
         })
       )
     )
   );
   console.log({ response, error });
+
+  /*
   const tracks = response
     .map(({ body }) => {
       const { id: playlistId, name: playlistName, tracks } = body;
       const { items } = tracks;
       return items.map((item) => {
+        item.playlistName = playlistName;
+        item.playlistId = playlistId;
+        return item;
+      });
+    })
+    .flat();*/
+
+  const tracks = response
+    .map((body) => {
+      const { playlistId, playlistName, tracks } = body;
+      return tracks.map((item) => {
         item.playlistName = playlistName;
         item.playlistId = playlistId;
         return item;
@@ -195,4 +262,5 @@ module.exports = {
   syncTracks,
   getTracks,
   handleTracksSync,
+  fetchPlaylistItems,
 };
