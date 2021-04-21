@@ -9,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const { NODE_ENV } = require("./config");
 const SpotifyRouter = require("./spotify/spotify-router");
 const { extractAccessToken } = require("./middlewares/extractAccessToken");
-const BASE_URL = "http://localhost:3000/";
+const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 
 const app = express();
 
@@ -26,7 +26,7 @@ app.use("/api", SpotifyRouter);
 
 const client_id = process.env.SPOTIFY_CLIENT_ID; // Your client id
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET; // Your secret
-const redirect_uri = "http://localhost:8000/callback/"; // Your redirect uri
+const redirect_uri = `${CLIENT_ORIGIN}/callback/`; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
@@ -68,15 +68,13 @@ app.get("/login", function (req, res) {
 app.get("/callback", function (req, res) {
   // your application requests refresh and access tokens
   // after checking the state parameter
-  console.log("in callback");
-
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
   console.log({ code, state, storedState });
   if (state === null || state !== storedState) {
     res.redirect(
-      `${BASE_URL}?` +
+      `${CLIENT_ORIGIN}?` +
         querystring.stringify({
           error: "state_mismatch",
         })
@@ -116,7 +114,7 @@ app.get("/callback", function (req, res) {
           console.log(body);
           // we can also pass the token to the browser to make requests from there
           res.redirect(
-            `${BASE_URL}?` +
+            `${CLIENT_ORIGIN}?` +
               querystring.stringify({
                 access_token: access_token,
                 refresh_token: refresh_token,
@@ -126,7 +124,7 @@ app.get("/callback", function (req, res) {
         });
       } else {
         res.redirect(
-          `${BASE_URL}?` +
+          `${CLIENT_ORIGIN}?` +
             querystring.stringify({
               error: "invalid_token",
             })

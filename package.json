@@ -31,7 +31,6 @@
     "logger": "0.0.1",
     "migrate": "^1.7.0",
     "morgan": "^1.10.0",
-    "node-fetch": "^2.6.1",
     "path": "^0.12.7",
     "pg": "^8.5.1",
     "postgrator": "^4.1.1",
