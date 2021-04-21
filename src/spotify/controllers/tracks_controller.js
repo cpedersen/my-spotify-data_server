@@ -1,7 +1,7 @@
 const spotifyModel = require("../spotify-model");
 const { createSpotifyInstance } = require("../spotify-service");
 const withAsync = require("../../helpers/withAsync");
-const fetch = require("node-fetch");
+require("isomorphic-fetch");
 
 const fetchPlaylistItems = async ({
   playlistId,
