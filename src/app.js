@@ -27,7 +27,7 @@ app.use("/api", SpotifyRouter);
 const client_id = process.env.SPOTIFY_CLIENT_ID; // Your client id
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET; // Your secret
 const redirect_uri = `${SERVER_ORIGIN}/callback/`; // Your redirect uri
-
+console.log({ CLIENT_ORIGIN, SERVER_ORIGIN, redirect_uri });
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string

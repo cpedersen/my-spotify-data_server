@@ -34,7 +34,7 @@ const SpotifyService = {
   },
   insertPlaylists(data) {
     console.log("************************");
-    console.log({ data });
+    //console.log({ data });
     console.log("************************");
     return db("playlists").insert(data);
   },
@@ -72,12 +72,23 @@ const SpotifyService = {
 
     // .where("playlist_tracks.spotify_user", userId);
   },
-  getTracks({ field, query }) {
-    console.log("getting tracks", field, query);
+  getTracks({ field, query, spotify_user }) {
+    console.log("getting tracks", field, query, spotify_user);
     // return db("tracks").where(field, "like", `%${query}%`);
-    return db("tracks").whereRaw(
-      `LOWER(${field}) LIKE '%' || LOWER(?) || '%' `,
+    /* return db("tracks").whereRaw(
+      `LOWER(${field}) LIKE '%' || LOWER(?) || '%'`,
       query
+    );*/
+    return db.raw(
+      `
+      select tracks.id, track_name, tracks.track_id, track_href, track_uri, tracks.external_url, artist, album, playlists.playlist_name
+      from tracks      
+      left join playlists
+      on tracks.playlist_id = playlists.playlist_id
+      where tracks.spotify_user = :spotify_user
+      and LOWER(tracks.track_name) like '%' || LOWER(:query) || '%'
+    `,
+      { spotify_user, query }
     );
   },
   deleteUserSyncData(spotify_user) {

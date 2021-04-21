@@ -27,9 +27,11 @@ const fetchPlaylistItems = async ({
   const responseBody = await response.json();
   const { items, next } = responseBody;
   // On the first call, there is no data, so set it up
+
   if (!data) {
+    console.log("no data, create object", playlistId);
     data = {
-      id: playlistId,
+      playlistId,
       tracks: items,
     };
   } else {
@@ -60,13 +62,12 @@ const fetchTracksForPlaylists = async (spotify, playlists) => {
       playlists.map((playlist) =>
         fetchPlaylistItems({
           playlistId: playlist.id,
-          playlistName: playlist.name,
+          // playlistName: playlist.name,
           access_token: spotify.getAccessToken(),
         })
       )
     )
   );
-  console.log({ response, error });
 
   /*
   const tracks = response
@@ -84,8 +85,9 @@ const fetchTracksForPlaylists = async (spotify, playlists) => {
   const tracks = response
     .map((body) => {
       const { playlistId, playlistName, tracks } = body;
+      console.log("in map body", { playlistId });
       return tracks.map((item) => {
-        item.playlistName = playlistName;
+        // item.playlistName = playlistName;
         item.playlistId = playlistId;
         return item;
       });
@@ -99,12 +101,12 @@ const fetchTracksForPlaylists = async (spotify, playlists) => {
 };
 
 const fetchUserPlaylists = async (spotify, userId) => {
+  // TODO: Fetch more playlists if a user has more than 50. Check "next" prop
   const { response, error } = await withAsync(() =>
     spotify.getUserPlaylists(userId, {
       limit: 50,
     })
   );
-  console.log({ response, error });
   const { items } = response.body;
   const data = await fetchTracksForPlaylists(spotify, items);
   return data;
@@ -120,6 +122,7 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
         TODO: check how to get added_at/created for the playlist
       */
     const { id, name, href, tracks, uri, external_urls } = playlist;
+    // console.log("in prepare sync data", id, Object.keys(playlist));
     const total_tracks = tracks.total;
     preparedPlaylists.push({
       spotify_user: spotifyUserId,
@@ -135,6 +138,7 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
 
   for (const item of tracks) {
     const { track, added_at, playlistId: playlist_id } = item;
+    console.log("in prepared tracks", playlist_id, Object.keys(item));
     const {
       id: track_id,
       name: track_name,
@@ -167,6 +171,7 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
       release_date,
       artist: artists[0]?.name || "",
       album: album.name,
+      playlist_id,
       // popularity
     });
   }
@@ -180,7 +185,6 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
 
 const insertSyncData = async (data) => {
   const { playlistTracks, preparedTracks, preparedPlaylists } = data;
-  console.log("check", { preparedTracks });
   return Promise.all([
     spotifyModel.insertTracks(preparedTracks),
     spotifyModel.insertPlaylists(preparedPlaylists),
@@ -202,17 +206,14 @@ const handleTracksSync = async (spotify, access_token, userId) => {
 
 const syncTracks = async (req, res) => {
   try {
-    console.log(req.headers);
     const spotify = createSpotifyInstance();
     const access_token = req.headers.authorization.slice(7);
     const { userId } = req.body;
-    console.log({ access_token });
     const { result, preparedData } = await handleTracksSync(
       spotify,
       access_token,
       userId
     );
-    console.log(result);
     /*
       Prepare tracks
       Prepare playlists
@@ -226,8 +227,12 @@ const syncTracks = async (req, res) => {
 };
 
 const getTracks = async (req, res) => {
-  const { query = "", searchBy = "title" } = req.query;
-  if (searchBy && !["title", "spotify-url"].includes(searchBy)) {
+  const { query = "", searchBy = "title", spotify_user = "" } = req.query;
+
+  if (
+    !spotify_user ||
+    (searchBy && !["title", "spotify-url"].includes(searchBy))
+  ) {
     res.status(422).send({
       message: "Incorrect searchBy parameter specified",
     });
@@ -241,6 +246,7 @@ const getTracks = async (req, res) => {
 
   const field = searchByMap?.[searchBy] || searchByMap.title;
   const { response, error } = await withAsync(spotifyModel.getTracks, {
+    spotify_user,
     query: query.toLowerCase(),
     field,
   });
@@ -253,8 +259,18 @@ const getTracks = async (req, res) => {
     return;
   }
 
+  const data = {};
+
+  console.log(response.rows);
+
+  for (const track of response.rows) {
+    const { id } = track;
+    if (id in data) continue;
+    data[id] = track;
+  }
+
   res.send({
-    data: response,
+    data: Object.values(data),
   });
 };
 
