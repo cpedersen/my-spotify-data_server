@@ -10,7 +10,7 @@ const { NODE_ENV } = require("./config");
 const SpotifyRouter = require("./spotify/spotify-router");
 const { extractAccessToken } = require("./middlewares/extractAccessToken");
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
-
+const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
 const app = express();
 
 //const morganOption = (process.env.NODE_ENV === 'production')
@@ -26,7 +26,7 @@ app.use("/api", SpotifyRouter);
 
 const client_id = process.env.SPOTIFY_CLIENT_ID; // Your client id
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET; // Your secret
-const redirect_uri = `${CLIENT_ORIGIN}/callback/`; // Your redirect uri
+const redirect_uri = `${SERVER_ORIGIN}/callback/`; // Your redirect uri
 
 /**
  * Generates a random string containing numbers and letters
