@@ -1,6 +1,6 @@
 # My Spotify Data
 
-The server-side of the `My Spotify Data` app uses the Spotify API to 1) log into a user's Spotify account, 2) search for a song among the user's playlists, 3) view the user's recent listening history, and 4) export the user's songs to a csv file.
+The server-side of the `My Spotify Data` application uses the Spotify Developer API to 1) log into a user's Spotify account, 2) search for a song among the user's playlists, 3) view the user's recent listening history, and 4) export the user's songs to a csv file.
 
 The app has a PostgreSQL database used to store 1) the username, 2) the user's playlists, and, 3) the user's songs. There are 3 main tables: spotify_users, playlists, and tracks.
 
