@@ -1,26 +1,27 @@
-# Express Boilerplate!
+# My Spotify Data
 
-This is a boilerplate project used for starting new projects!
+The server-side of the `My Spotify Data` app uses the Spotify API to 1) log into a user's Spotify account, 2) search for a song among the user's playlists, 3) view the user's recent listening history, and 4) export the user's songs to a csv file.
 
-## Setup
+The app has a PostgreSQL database used to store 1) the username, 2) the user's playlists, and, 3) the user's songs. There are 3 main tables: spotify_users, playlists, and tracks.
 
-Complete the following steps to start a new project (NEW-PROJECT-NAME):
+## Spotify Login & Token Management
 
-1. Clone this repository to your local machine `git clone BOILERPLATE-URL NEW-PROJECTS-NAME`
-2. `cd` into the cloned repository
-3. Make a fresh start of the git history for this project with `rm -rf .git && git init`
-4. Install the node dependencies `npm install`
-5. Move the example Environment file to `.env` that will be ignored by git and read by the express server `mv example.env .env`
-6. Edit the contents of the `package.json` to use NEW-PROJECT-NAME instead of `"name": "express-boilerplate",`
+Spotify Web authorization template code used for login, token access, and token refresh:
 
-## Scripts
+https://github.com/spotify/web-api-auth-examples/blob/master/authorization_code/app.js
 
-Start the application `npm start`
+## Spotify GET API - list of user's playlists
 
-Start nodemon for the application `npm run dev`
+GET https://api.spotify.com/v1/me/playlists
 
-Run the tests `npm test`
+## Spotify GET API - user's tracks
 
-## Deploying
+GET https://api.spotify.com/v1/tracks
 
-When your new project is ready for deployment, add a new Heroku application with `heroku create`. This will make a new git remote called "heroku" and you can then `npm run deploy` which will push to this remote's master branch.# my-spotify-data-static_server
+## Spotify GET API - user's current listening history
+
+GET https://api.spotify.com/v1/me/player/recently-played
+
+## App DB POST
+
+Along with using the Spotify API to perform GETs of user data, this app also does a PostgreSQL POST of user song data to the My Spotify Data database.
