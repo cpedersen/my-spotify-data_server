@@ -26,8 +26,8 @@ playlistsRouter.get("/test", async (req, res) => {
     access_token,
     playlistId: "2Yib6d04SZuvP4ZMgUmXjM",
   });
-  console.log({ response });
-  console.log("Items num", response.tracks.length);
+  //console.log({ response });
+  //console.log("Items num", response.tracks.length);
   res.send(response);
 });
 

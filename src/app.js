@@ -27,7 +27,7 @@ app.use("/api", SpotifyRouter);
 const client_id = process.env.SPOTIFY_CLIENT_ID; // Your client id
 const client_secret = process.env.SPOTIFY_CLIENT_SECRET; // Your secret
 const redirect_uri = `${SERVER_ORIGIN}/callback/`; // Your redirect uri
-console.log({ CLIENT_ORIGIN, SERVER_ORIGIN, redirect_uri });
+//console.log({ CLIENT_ORIGIN, SERVER_ORIGIN, redirect_uri });
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
@@ -71,7 +71,7 @@ app.get("/callback", function (req, res) {
   var code = req.query.code || null;
   var state = req.query.state || null;
   var storedState = req.cookies ? req.cookies[stateKey] : null;
-  console.log({ code, state, storedState });
+  //console.log({ code, state, storedState });
   if (state === null || state !== storedState) {
     res.redirect(
       `${CLIENT_ORIGIN}?` +
@@ -100,9 +100,7 @@ app.get("/callback", function (req, res) {
       if (!error && response.statusCode === 200) {
         var access_token = body.access_token,
           refresh_token = body.refresh_token;
-
-        console.log({ access_token, refresh_token });
-
+        //console.log({ access_token, refresh_token });
         var options = {
           url: "https://api.spotify.com/v1/me",
           headers: { Authorization: "Bearer " + access_token },
@@ -111,7 +109,7 @@ app.get("/callback", function (req, res) {
 
         // use the access token to access the Spotify Web API
         request.get(options, function (error, response, body) {
-          console.log(body);
+          //console.log(body);
           // we can also pass the token to the browser to make requests from there
           res.redirect(
             `${CLIENT_ORIGIN}?` +
@@ -153,7 +151,7 @@ app.get("/refresh_token", function (req, res) {
 
   request.post(authOptions, function (error, response, body) {
     if (!error && response.statusCode === 200) {
-      console.log("refreshed!", body);
+      //console.log("refreshed!", body);
       var access_token = body.access_token;
       res.send({
         access_token: access_token,

@@ -7,7 +7,7 @@ const getListeningHistory = async (req, res) => {
     const response = await spotify.getMyRecentlyPlayedTracks({
       limit: 50,
     });
-    console.log(response);
+    //console.log(response);
     res.send({
       response,
     });

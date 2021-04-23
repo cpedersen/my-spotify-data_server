@@ -6,10 +6,10 @@ const createSyncUser = async (req, res) => {
   try {
     const { userId } = req.body;
     const { access_token } = req.user;
-    console.log("in create sync", userId, req.body, req.user);
+    //console.log("in create sync", userId, req.body, req.user);
     const spotify = createSpotifyInstance();
     const user = await spotifyModel.getUser(userId);
-    console.log(user);
+    //console.log(user);
 
     if (user.length) {
       res.send({
@@ -24,7 +24,7 @@ const createSyncUser = async (req, res) => {
       access_token,
       userId
     );
-    console.log({ result, preparedData });
+    //console.log({ result, preparedData });
     res.send({
       data: {
         result,
@@ -42,9 +42,8 @@ const createSyncUser = async (req, res) => {
 const exportData = async (req, res) => {
   try {
     const { user_id } = req.params;
-    console.log("export", req.params);
+    //console.log("export", req.params);
     const data = await spotifyModel.getExportData(user_id);
-    // TODO - is this sending what is needed for export?
     res.send({
       rows: data.rows,
     });

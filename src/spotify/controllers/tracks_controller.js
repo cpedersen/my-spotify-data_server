@@ -29,7 +29,7 @@ const fetchPlaylistItems = async ({
   // On the first call, there is no data, so set it up
 
   if (!data) {
-    console.log("no data, create object", playlistId);
+    //console.log("no data, create object", playlistId);
     data = {
       playlistId,
       tracks: items,
@@ -85,7 +85,7 @@ const fetchTracksForPlaylists = async (spotify, playlists) => {
   const tracks = response
     .map((body) => {
       const { playlistId, playlistName, tracks } = body;
-      console.log("in map body", { playlistId });
+      //console.log("in map body", { playlistId });
       return tracks.map((item) => {
         // item.playlistName = playlistName;
         item.playlistId = playlistId;
@@ -138,7 +138,7 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
 
   for (const item of tracks) {
     const { track, added_at, playlistId: playlist_id } = item;
-    console.log("in prepared tracks", playlist_id, Object.keys(item));
+    //console.log("in prepared tracks", playlist_id, Object.keys(item));
     const {
       id: track_id,
       name: track_name,
@@ -258,11 +258,8 @@ const getTracks = async (req, res) => {
     });
     return;
   }
-
   const data = {};
-
-  console.log(response.rows);
-
+  //console.log(response.rows);
   for (const track of response.rows) {
     const { id } = track;
     if (id in data) continue;
