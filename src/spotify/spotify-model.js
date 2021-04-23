@@ -33,9 +33,7 @@ const SpotifyService = {
     return db("tracks").insert(data);
   },
   insertPlaylists(data) {
-    console.log("************************");
     //console.log({ data });
-    console.log("************************");
     return db("playlists").insert(data);
   },
   insertPlaylistTracks(data) {
@@ -73,7 +71,7 @@ const SpotifyService = {
     // .where("playlist_tracks.spotify_user", userId);
   },
   getTracks({ field, query, spotify_user }) {
-    console.log("getting tracks", field, query, spotify_user);
+    //console.log("getting tracks", field, query, spotify_user);
     // return db("tracks").where(field, "like", `%${query}%`);
     /* return db("tracks").whereRaw(
       `LOWER(${field}) LIKE '%' || LOWER(?) || '%'`,
