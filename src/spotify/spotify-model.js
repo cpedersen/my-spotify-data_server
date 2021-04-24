@@ -58,13 +58,11 @@ const SpotifyService = {
       );*/
 
     return db.raw(
-      `select track_name, playlist_name
-    from playlist_tracks 
-    inner join tracks
-    on playlist_tracks.track_id = tracks.track_id
-    inner join playlists
-    on playlist_tracks.playlist_id = playlists.playlist_id
-    where playlist_tracks.spotify_user = ?;`,
+      `select track_name, playlist_name 
+      from playlists join tracks 
+      on playlists.playlist_id = tracks.playlist_id 
+      where playlists.spotify_user = ? 
+      order by tracks.track_name ASC;`,
       [userId]
     );
 
@@ -84,7 +82,7 @@ const SpotifyService = {
       left join playlists
       on tracks.playlist_id = playlists.playlist_id
       where tracks.spotify_user = :spotify_user
-      and LOWER(tracks.track_name) like '%' || LOWER(:query) || '%'
+      and LOWER(tracks.${field}) like '%' || LOWER(:query) || '%'
     `,
       { spotify_user, query }
     );
