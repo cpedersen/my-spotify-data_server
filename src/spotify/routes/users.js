@@ -23,9 +23,9 @@ usersRouter.get("/all", (req, res) => {
 */
 
 // /api/users/52341
-usersRouter.get("/:user_id", (req, res) => {
-  res.send("ok");
-});
+// usersRouter.get("/:user_id", (req, res) => {
+//   res.send("ok");
+// });
 
 usersRouter.put("/", createSyncUser);
 usersRouter.get("/export-data/:user_id", exportData);

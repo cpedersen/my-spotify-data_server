@@ -1,4 +1,4 @@
-const { expect } = require("chai").expect;
+const expect = require("chai").expect;
 const supertest = require("supertest");
 const app = require("../src/app");
 const knex = require("knex");
@@ -31,18 +31,21 @@ describe("Spotify Database", function () {
   let db;
 
   before("Connect to DB and then clean out all test tables", async () => {
-    console.log("TEST_DATABASE_URL: ", TEST_DATABASE_URL);
+    //console.log("TEST_DATABASE_URL: ", TEST_DATABASE_URL);
     db = knex({
       client: "pg",
       connection: TEST_DATABASE_URL,
     });
     app.set("db", db);
 
+    /*await Promise.all([
+      Run all of them at once here
+    ])*/
     await db("spotify_users").truncate();
     await db("tracks").truncate();
     await db("playlists").truncate();
     await db("playlist_tracks").truncate();
-    console.log("DB tables are cleaned out");
+    //console.log("DB tables are cleaned out");
   });
 
   //before("clean out the tracks table", () => db("tracks").truncate());
@@ -72,7 +75,7 @@ describe("Spotify Database", function () {
 
   before("insert spotify_users data", async () => {
     //return spotifyModel.createUser(userData);
-    console.log("inserting spotify_users data");
+    //console.log("inserting spotify_users data");
     return await db("spotify_users").insert({
       id: 1,
       spotify_user: "Dunder Mifflin",
@@ -81,7 +84,7 @@ describe("Spotify Database", function () {
 
   before("insert tracks data", async () => {
     //return spotifyModel.insertTracks(songData);
-    console.log("inserting tracks data");
+    //console.log("inserting tracks data");
     return await db("tracks").insert({
       id: 1,
       spotify_user: "Dunder Mifflin",
@@ -98,7 +101,7 @@ describe("Spotify Database", function () {
 
   before("insert playlists data", async () => {
     //return spotifyModel.insertPlaylists(playlistData);
-    console.log("inserting playlists data");
+    //console.log("inserting playlists data");
     return await db("playlists").insert({
       id: 1,
       spotify_user: "Dunder Mifflin",
@@ -110,18 +113,6 @@ describe("Spotify Database", function () {
       external_url: "https://open.spotify.com/playlist/58OeUrx5150jMwaN8O8PrA",
       added_at: "2021-04-18",
       total_tracks: "6",
-    });
-  });
-
-  before("insert playlist_tracks data", async () => {
-    //return spotifyModel.insertPlaylistTracks(playlistTracksData);
-    console.log("inserting playlist_tacks data");
-    return await db("playlist_tracks").insert({
-      id: 1,
-      track_id: "5FZxsHWIvUsmSK1IAvm2pp",
-      spotify_user: "Dunder Mifflin",
-      playlist_id: "58OeUrx5150jMwaN8O8PrA",
-      added_at: "2021-04-18",
     });
   });
 
@@ -146,18 +137,56 @@ describe("Spotify Database", function () {
       .get("/api/users/all")
       .expect(200)
       .then((response) => {
-        console.log("response.body check to go here");
+        //console.log("response.body check to go here");
         //expect(response.body).to.have.to.have.all.keys("id", "spotify_user");
         //expect(response.body.spotify_user).to.equal("Dunder Mifflin");
       });
   });
 
   it("GET /api/tracks responds with 200 for tracks data", async () => {
+    const config = {
+      query: "Best of you",
+      searchBy: "title",
+      spotify_user: "t9dgdc5lr7uxj9eja1yze5i1m",
+    };
+    const { query, searchBy, spotify_user } = config;
     return supertest(app)
-      .get("/api/tracks")
+      .get(
+        `/api/tracks?query=${query}&searchBy=${searchBy}&spotify_user=${spotify_user}`
+      )
       .expect(200)
       .then((response) => {
-        console.log("response.body check to go here");
+        expect(response.body.data).to.have.lengthOf(1);
+        const track = response.body.data[0];
+        expect(track).to.have.all.keys(
+          "id",
+          "track_name",
+          "track_id",
+          "track_href",
+          "track_uri",
+          "playlist_name",
+          "external_url",
+          "artist",
+          "album"
+        );
+
+        const obj = {
+          track_name: "Best of You",
+          track_id: "5FZxsHWIvUsmSK1IAvm2pp",
+          track_href:
+            "https://api.spotify.com/v1/tracks/5FZxsHWIvUsmSK1IAvm2pp",
+          track_uri: "spotify:track:5FZxsHWIvUsmSK1IAvm2pp",
+          external_url: "https://open.spotify.com/track/5FZxsHWIvUsmSK1IAvm2pp",
+          artist: "Foo Fighters",
+          album: "In Your Honor",
+          playlist_name: "My Playlist #1",
+        };
+
+        const { id: _, ...trackWithoutId } = track;
+
+        expect(trackWithoutId).to.deep.equal(obj);
+
+        //console.log("response.body check to go here");
         /*expect(response.body).to.have.to.have.all.keys(
             "id",
             "spotify_user",
@@ -174,49 +203,9 @@ describe("Spotify Database", function () {
       });
   });
 
-  it("GET /api/playlists responds with 200 for playlists data", async () => {
-    return supertest(app)
-      .get("/api/playlists/all")
-      .expect(200)
-      .then((response) => {
-        console.log("response.body check to go here");
-        /*expect(response.body).to.have.to.have.all.keys(
-            "id",
-            "spotify_user",
-            "playlist_name",
-            "playlist_id",
-            "playlist_href",
-            "playlist_uri",
-            "external_url",
-            "added_at",
-            "total_tracks"
-          );
-          expect(response.body.playlist_name).to.equal("Foo Fighters");*/
-      });
+  it("GET /api/listening_history responds with 200 for listening_history data", () => {
+    return supertest(app).get("/api/listening_history/all").expect(200);
   });
-
-  it("GET /api/playlist_tracks responds with 200 for playlist_tracks data", async () => {
-    return supertest(app)
-      .get("/api/playlist_tracks/all")
-      .expect(200)
-      .then((response) => {
-        console.log("response.body check to go here");
-        /*expect(response.body).to.have.to.have.all.keys(
-            "id",
-            "spotify_user",
-            "track_id",
-            "playlist_id",
-            "added_at"
-          );
-          expect(response.body.playlist_name).to.equal("Foo Fighters");*/
-      });
-  });
-
-  /*
-    it("GET /api/listening_history responds with 200 for listening_history data", () => {
-      return supertest(app).get("/api/listening_history").expect(200);
-    });
-    */
 
   /*
     it("GET /api/audio_analysis responds with 200 for audio_analysis data", () => {
