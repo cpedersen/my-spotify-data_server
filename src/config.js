@@ -1,5 +1,4 @@
 require("dotenv").config();
-//const path = require("path");
 
 const CLIENT_ORIGIN =
   process.env.NODE_ENV === "production"

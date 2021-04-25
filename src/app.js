@@ -13,7 +13,6 @@ const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN;
 const SERVER_ORIGIN = process.env.SERVER_ORIGIN;
 const app = express();
 
-//const morganOption = (process.env.NODE_ENV === 'production')
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 app.use(express.json()); // for parsing application/json
 app.use(express.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -65,8 +64,9 @@ app.get("/login", function (req, res) {
   );
 });
 
+// The following code is taken from Spotify authentication template
 app.get("/callback", function (req, res) {
-  // your application requests refresh and access tokens
+  // Your application requests refresh and access tokens
   // after checking the state parameter
   var code = req.query.code || null;
   var state = req.query.state || null;

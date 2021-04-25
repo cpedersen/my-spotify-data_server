@@ -1,7 +1,6 @@
 const { default: knex } = require("knex");
 const db = require("../services/knex");
 
-// TODO - change to SpotifyModel
 const SpotifyService = {
   getAllUsers() {
     return db.select("*").from("spotify_users");
@@ -46,17 +45,6 @@ const SpotifyService = {
     return db("audio_analysis").insert(data);
   },
   getExportData(userId) {
-    /*return db
-      .select("track_name, playlist_name")
-      .from("playlist_tracks")
-      .join("tracks", "playlist_tracks.track_id", "=", "tracks.track_id")
-      .join(
-        "playlists",
-        "playlist_tracks.playlist_id",
-        "=",
-        "playlists.playlist_id"
-      );*/
-
     return db.raw(
       `select track_name, playlist_name 
       from playlists join tracks 
@@ -65,16 +53,8 @@ const SpotifyService = {
       order by tracks.track_name ASC;`,
       [userId]
     );
-
-    // .where("playlist_tracks.spotify_user", userId);
   },
   getTracks({ field, query, spotify_user }) {
-    //console.log("getting tracks", field, query, spotify_user);
-    // return db("tracks").where(field, "like", `%${query}%`);
-    /* return db("tracks").whereRaw(
-      `LOWER(${field}) LIKE '%' || LOWER(?) || '%'`,
-      query
-    );*/
     return db.raw(
       `
       select tracks.id, track_name, tracks.track_id, track_href, track_uri, tracks.external_url, artist, album, playlists.playlist_name
@@ -87,6 +67,7 @@ const SpotifyService = {
       { spotify_user, query }
     );
   },
+  // TODO - Post bootcamp I will be implementing a purge DB option
   deleteUserSyncData(spotify_user) {
     return Promise.all([
       db("tracks").where("spotify_user", spotify_user).del(),

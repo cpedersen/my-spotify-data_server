@@ -62,32 +62,17 @@ const fetchTracksForPlaylists = async (spotify, playlists) => {
       playlists.map((playlist) =>
         fetchPlaylistItems({
           playlistId: playlist.id,
-          // playlistName: playlist.name,
           access_token: spotify.getAccessToken(),
         })
       )
     )
   );
 
-  /*
-  const tracks = response
-    .map(({ body }) => {
-      const { id: playlistId, name: playlistName, tracks } = body;
-      const { items } = tracks;
-      return items.map((item) => {
-        item.playlistName = playlistName;
-        item.playlistId = playlistId;
-        return item;
-      });
-    })
-    .flat();*/
-
   const tracks = response
     .map((body) => {
       const { playlistId, playlistName, tracks } = body;
       //console.log("in map body", { playlistId });
       return tracks.map((item) => {
-        // item.playlistName = playlistName;
         item.playlistId = playlistId;
         return item;
       });
@@ -101,7 +86,6 @@ const fetchTracksForPlaylists = async (spotify, playlists) => {
 };
 
 const fetchUserPlaylists = async (spotify, userId) => {
-  // TODO: Fetch more playlists if a user has more than 50. Check "next" prop
   const { response, error } = await withAsync(() =>
     spotify.getUserPlaylists(userId, {
       limit: 50,
@@ -118,9 +102,6 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
   let preparedPlaylists = [];
 
   for (const playlist of playlists) {
-    /*
-        TODO: check how to get added_at/created for the playlist
-      */
     const { id, name, href, tracks, uri, external_urls } = playlist;
     // console.log("in prepare sync data", id, Object.keys(playlist));
     const total_tracks = tracks.total;
@@ -146,9 +127,6 @@ const prepareSyncData = ({ tracks, playlists }, spotifyUserId) => {
       uri: track_uri,
       popularity,
       external_urls,
-      /*
-        TODO: Needs to support multiple artists
-        */
       album,
       artists,
       release_date,
@@ -214,12 +192,7 @@ const syncTracks = async (req, res) => {
       access_token,
       userId
     );
-    /*
-      Prepare tracks
-      Prepare playlists
-      Prepare playlist_tracks association
-    
-      */
+
     res.json(preparedData);
   } catch (error) {
     res.status(500).send(error.message);

@@ -1,5 +1,7 @@
 const audioAnalysisRouter = require("express").Router();
 
+// TODO - Post-bootcamp I will be implementing audio analysis
+
 // const serializeAudioAnalysis = (track) => ({
 //   id: track.id,
 //   spotify_user: xss(track.track_id),

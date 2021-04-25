@@ -1,3 +1,4 @@
+// Route controllers use async
 const withAsync = async (fn, ...args) => {
   try {
     const response = await fn(...args);

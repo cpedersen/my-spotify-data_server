@@ -1,5 +1,7 @@
 const playlistsRouter = require("express").Router();
 
+// TODO - Post bootcamp I will be implementing audio analysis
+
 // const serializePlaylist = (playlist) => ({
 //   id: playlist.id,
 //   spotify_user: xss(playlist.spotify_user),

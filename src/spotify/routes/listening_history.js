@@ -15,12 +15,10 @@ const serializeListeningHistory = (user) => ({
   album: xss(user.album),
 });
 
-// /api/history/all
 listeningHistoryRouter.get("/all", (req, res) => {
   res.send("ok");
 });
 
-// /api/history/52341
 listeningHistoryRouter.get("/:user_id", getListeningHistory);
 
 module.exports = listeningHistoryRouter;
